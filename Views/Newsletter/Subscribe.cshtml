@@ -1,0 +1,32 @@
+﻿@model Newsletter.Models.Subscriber
+
+<!-- Display message from the TempData sent by the controller -->
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @TempData["SuccessMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"><i class="fas fa-times"></i></button>
+    </div>
+}
+
+<h2>Subscribe to our newsletter</h2>
+
+<!-- The form to subscribe to the newsletter. Uses ASP tag helpers for validation -->
+<form asp-action="Subscribe" method="post">
+    <div class="form-group">
+        <label asp-for="Name" class="control-label"></label>
+        <input asp-for="Name" class="form-control" />
+        <span asp-validation-for="Name" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Email" class="control-label"></label>
+        <input asp-for="Email" class="form-control" />
+        <span asp-validation-for="Email" class="text-danger"></span>
+    </div>
+    <button type="submit" class="btn btn-primary">Subscribe</button>
+</form>
+
+<!-- This script is used to display the validation error messages on the client side -->
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
