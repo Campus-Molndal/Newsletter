@@ -68,7 +68,7 @@ namespace Newsletter.Services;
 
 public interface INewsletterService
 {
-    ValidationResult EnlistSubscriber(Subscriber subscriber);
+    Task<ValidationResult> EnlistSubscriberAsync(Subscriber subscriber);
 }
 ```
 
@@ -94,7 +94,7 @@ public class NewsletterService : INewsletterService
 {
     private readonly List<string> _registeredEmails = new List<string>(); // Mocked database
 
-    public ValidationResult EnlistSubscriber(Subscriber subscriber)
+    public async Task<ValidationResult> EnlistSubscriberAsync(Subscriber subscriber)
     {
         // Validate email format
         var emailRegex = new Regex(@"^[^@\s]+@[^@\s]+\.[^@\s]+$");
@@ -110,6 +110,7 @@ public class NewsletterService : INewsletterService
         }
 
         // Simulate adding the subscriber to the system
+        await Task.Delay(100); // Simulate an operation
         _registeredEmails.Add(subscriber.Email!);
         return ValidationResult.Success();
     }
@@ -199,8 +200,7 @@ public class NewsletterController : Controller
             Console.WriteLine($"Name: {subscriber.Name}, Email: {subscriber.Email}");
 
             // TODO: Implement the subscription logic
-            await Task.Delay(100); // Simulate an operation
-            var result = _newsletterService.EnlistSubscriber(subscriber);
+            var result = await _newsletterService.EnlistSubscriberAsync(subscriber);
 
             if (!result.IsSuccess)
             {
