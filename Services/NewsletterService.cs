@@ -1,13 +1,19 @@
 using System.Text.RegularExpressions;
+using Newsletter.Data;
 using Newsletter.Models;
 
 namespace Newsletter.Services;
 
 public class NewsletterService : INewsletterService
 {
-    private readonly List<string> _registeredEmails = new List<string>(); // Mocked database
+    private readonly ISubscriberRepository _subscriberRepository;
 
-    public ValidationResult EnlistSubscriber(Subscriber subscriber)
+    public NewsletterService(ISubscriberRepository subscriberRepository)
+    {
+        _subscriberRepository = subscriberRepository;
+    }
+
+    public async Task<ValidationResult> EnlistSubscriberAsync(Subscriber subscriber)
     {
         // Validate email format
         var emailRegex = new Regex(@"^[^@\s]+@[^@\s]+\.[^@\s]+$");
@@ -17,13 +23,13 @@ public class NewsletterService : INewsletterService
         }
 
         // Check for duplicate email
-        if (_registeredEmails.Contains(subscriber.Email!))
+        if (await _subscriberRepository.GetSubscriberByEmailAsync(subscriber.Email!) != null)
         {
             return ValidationResult.Failure("This email is already registered.");
         }
 
         // Simulate adding the subscriber to the system
-        _registeredEmails.Add(subscriber.Email!);
+        await _subscriberRepository.AddSubscriberAsync(subscriber);
         return ValidationResult.Success();
     }
 }

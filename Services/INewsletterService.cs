@@ -4,5 +4,5 @@ namespace Newsletter.Services;
 
 public interface INewsletterService
 {
-    ValidationResult EnlistSubscriber(Subscriber subscriber);
+    Task<ValidationResult> EnlistSubscriberAsync(Subscriber subscriber);
 }

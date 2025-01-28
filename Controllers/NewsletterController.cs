@@ -44,7 +44,7 @@ public class NewsletterController : Controller
 
             // TODO: Implement the subscription logic
             await Task.Delay(100); // Simulate an operation
-            var result = _newsletterService.EnlistSubscriber(subscriber);
+            var result = await _newsletterService.EnlistSubscriberAsync(subscriber);
 
             if (!result.IsSuccess)
             {

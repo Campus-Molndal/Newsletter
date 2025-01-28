@@ -1,3 +1,4 @@
+using Newsletter.Data;
 using Newsletter.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -11,6 +12,9 @@ builder.Services.AddAuthentication("Cookies")
 
 // Register the newsletter service in the DI container
 builder.Services.AddSingleton<INewsletterService, NewsletterService>();
+
+// Register the subscriber repository in the DI container
+builder.Services.AddSingleton<ISubscriberRepository, InMemorySubscriberRepository>();
 
 var app = builder.Build();
 
