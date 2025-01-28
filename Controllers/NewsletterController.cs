@@ -1,10 +1,19 @@
 using Microsoft.AspNetCore.Mvc;
 using Newsletter.Models;
+using Newsletter.Services;
 
 namespace Newsletter.Controllers;
 
 public class NewsletterController : Controller
 {
+
+    private readonly INewsletterService _newsletterService;
+
+    public NewsletterController(INewsletterService newsletterService)
+    {
+        _newsletterService = newsletterService;
+    }
+
     public IActionResult Index()
     {
         // Create a subscriber object and pass it to the view
@@ -35,6 +44,17 @@ public class NewsletterController : Controller
 
             // TODO: Implement the subscription logic
             await Task.Delay(100); // Simulate an operation
+            var result = _newsletterService.EnlistSubscriber(subscriber);
+
+            if (!result.IsSuccess)
+            {
+                foreach (var error in result.Errors)
+                {
+                    ModelState.AddModelError(string.Empty, error);
+                }
+
+                return View(subscriber); // Redisplay the form with validation errors
+            }
 
             // Set a result message in TempData in order to display it in the view
             TempData["SuccessMessage"] = "You have successfully subscribed to our newsletter!";

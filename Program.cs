@@ -1,3 +1,5 @@
+using Newsletter.Services;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -6,6 +8,9 @@ builder.Services.AddControllersWithViews();
 // Add support for basic authentication
 builder.Services.AddAuthentication("Cookies")
     .AddCookie(options => options.LoginPath = "/Account/Login");
+
+// Register the newsletter service in the DI container
+builder.Services.AddSingleton<INewsletterService, NewsletterService>();
 
 var app = builder.Build();
 

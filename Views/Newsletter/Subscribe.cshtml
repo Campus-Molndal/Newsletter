@@ -1,5 +1,14 @@
 ﻿@model Newsletter.Models.Subscriber
 
+<!-- Display validation error message sent by the controller -->
+@if (!ViewData.ModelState.IsValid)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        @Html.ValidationSummary(false, null, new { @class = "text-danger" })
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"><i class="fas fa-times"></i></button>
+    </div>
+}
+
 <!-- Display message from the TempData sent by the controller -->
 @if (TempData["SuccessMessage"] != null)
 {
