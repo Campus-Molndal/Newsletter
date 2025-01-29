@@ -60,6 +60,7 @@ public class InMemorySubscriberRepository : ISubscriberRepository
 
     public Task AddSubscriberAsync(Subscriber subscriber)
     {
+        subscriber.Id = Guid.NewGuid().ToString();
         _subscribers.Add(subscriber);
         return Task.CompletedTask;
     }
