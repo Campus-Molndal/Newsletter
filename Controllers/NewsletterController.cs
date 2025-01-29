@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newsletter.Models;
 using Newsletter.Services;
@@ -67,4 +68,28 @@ public class NewsletterController : Controller
         return View(subscriber);
     }
 
+    [Authorize] // Protect this action with authentication
+    public async Task<IActionResult> Subscribers()
+    {
+        var subscribers = await _newsletterService.GetSubscribersAsync();
+        return View(subscribers);
+    }
+
+    [Authorize]
+    [HttpPost]
+    public async Task<IActionResult> Unsubscribe(string email)
+    {
+        var result = await _newsletterService.CancelSubscriptionAsync(email);
+
+        if (result.IsSuccess)
+        {
+            TempData["SuccessMessage"] = $"Subscriber with email '{email}' has been unsubscribed.";
+        }
+        else
+        {
+            TempData["ErrorMessage"] = $"Subscriber with email '{email}' was not found.";
+        }
+
+        return RedirectToAction("Subscribers");
+    }
 }

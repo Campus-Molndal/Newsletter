@@ -32,4 +32,21 @@ public class NewsletterService : INewsletterService
         await _subscriberRepository.AddSubscriberAsync(subscriber);
         return ValidationResult.Success();
     }
+    
+    public async Task<IEnumerable<Subscriber>> GetSubscribersAsync()
+    {
+        return await _subscriberRepository.GetSubscribersAsync();
+    }
+    
+    public async Task<ValidationResult> CancelSubscriptionAsync(string subscriberEmail)
+    {
+        var subscriber = await _subscriberRepository.GetSubscriberByEmailAsync(subscriberEmail);
+        if (subscriber == null || subscriber.Id == null)
+        {
+            return ValidationResult.Failure("Subscriber not found.");
+        }
+    
+        await _subscriberRepository.RemoveSubscriberAsync(subscriber.Id);
+        return ValidationResult.Success();
+    }
 }
