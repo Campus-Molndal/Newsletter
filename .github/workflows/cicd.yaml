@@ -1,0 +1,40 @@
+name: CI/CD Pipeline # Name of the GitHub Actions workflow
+
+on:
+  push: # Trigger the workflow on push events
+    branches:
+      - main # Only trigger on pushes to the 'main' branch
+  pull_request: # Trigger the workflow on pull request events
+    branches:
+      - main # Only trigger on pull requests targeting the 'main' branch
+  workflow_dispatch: # Enable manual triggering of the workflow
+
+jobs:
+  build:
+    runs-on: ubuntu-latest # Use the latest Ubuntu runner
+
+    steps:
+    - name: Checkout repository # Check out the repository to the GitHub Actions runner
+      uses: actions/checkout@v4
+
+    - name: Setup .NET SDK # Set up the .NET SDK according to the specified version
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '9.0.x' # Specify the .NET version to use
+
+    - name: Restore, build and publish # Restore dependencies, build, and publish the app
+      run: |
+        echo "Restore the NuGet packages without using the cache"
+        dotnet restore --no-cache
+
+        echo "Build the app in Release configuration without restoring dependencies"
+        dotnet build --configuration Release --no-restore
+        
+        echo "Publish the app to the 'publish' directory in the repository root"
+        dotnet publish --configuration Release --no-restore --output ./publish
+
+    - name: Upload app artifacts # Upload the published app artifacts to the GitHub artifact repository
+      uses: actions/upload-artifact@v4
+      with:
+        name: app-artifacts # Name the artifact 'app-artifacts'
+        path: publish # Specify the path to the 'publish' directory in the repository root
