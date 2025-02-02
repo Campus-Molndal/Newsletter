@@ -35,3 +35,26 @@ jobs:
       with:
         name: app-artifacts # Name the artifact 'app-artifacts'
         path: publish # Specify the path to the 'publish' directory in the repository root
+
+  deploy:
+    runs-on: self-hosted # Use a self-hosted runner for deployment (that runs on the Azure VM)
+    needs: build # Ensure the build job completes successfully before running this job
+
+    steps:
+    - name: Download the artifacts from Github (from the build job) # Download the build artifacts
+      uses: actions/download-artifact@v4
+      with:
+        name: app-artifacts # Specify the name of the artifact to download
+
+    - name: Stop the application service # Stop the running application service
+      run: sudo systemctl stop Newsletter.service        
+
+    - name: Deploy the application # Deploy the new version of the application
+      run: |
+        echo "Remove the existing application directory"
+        sudo rm -Rf /opt/Newsletter || true
+        echo "Copy the new build to the application directory"
+        sudo cp -r /home/azureuser/actions-runner/_work/Newsletter/Newsletter/ /opt/Newsletter
+
+    - name: Start the application service # Start the application service
+      run: sudo systemctl start Newsletter.service
