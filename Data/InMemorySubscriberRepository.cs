@@ -5,35 +5,57 @@ namespace Newsletter.Data;
 public class InMemorySubscriberRepository : ISubscriberRepository
 {
     private readonly List<Subscriber> _subscribers = new();
+    private readonly object _lock = new();
 
     public Task AddSubscriberAsync(Subscriber subscriber)
     {
-        subscriber.Id = Guid.NewGuid().ToString();
-        _subscribers.Add(subscriber);
+        lock (_lock)
+        {
+            subscriber.Id = Guid.NewGuid().ToString();
+            _subscribers.Add(subscriber);
+        }
         return Task.CompletedTask;
     }
 
     public Task<IEnumerable<Subscriber>> GetSubscribersAsync()
     {
-        return Task.FromResult<IEnumerable<Subscriber>>(_subscribers);
+        IEnumerable<Subscriber> subscribersSnapshot;
+        lock (_lock)
+        {
+            subscribersSnapshot = _subscribers.ToList();
+        }
+        return Task.FromResult(subscribersSnapshot);
     }
 
     public Task<Subscriber?> GetSubscriberByIdAsync(string id)
     {
-        return Task.FromResult(_subscribers.FirstOrDefault(s => s.Id == id));
+        Subscriber? subscriber;
+        lock (_lock)
+        {
+            subscriber = _subscribers.FirstOrDefault(s => s.Id == id);
+        }
+        return Task.FromResult(subscriber);
     }
 
     public Task<Subscriber?> GetSubscriberByEmailAsync(string email)
     {
-        return Task.FromResult(_subscribers.FirstOrDefault(s => s.Email == email));
+        Subscriber? subscriber;
+        lock (_lock)
+        {
+            subscriber = _subscribers.FirstOrDefault(s => s.Email == email);
+        }
+        return Task.FromResult(subscriber);
     }
 
     public Task RemoveSubscriberAsync(string id)
     {
-        var subscriber = _subscribers.FirstOrDefault(s => s.Id == id);
-        if (subscriber != null)
+        lock (_lock)
         {
-            _subscribers.Remove(subscriber);
+            var subscriber = _subscribers.FirstOrDefault(s => s.Id == id);
+            if (subscriber != null)
+            {
+                _subscribers.Remove(subscriber);
+            }
         }
         return Task.CompletedTask;
     }
